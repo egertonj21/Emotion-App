@@ -1,0 +1,1 @@
+Basic webapp that connects to a database API allowing users to log and view emotional records including triggers.
