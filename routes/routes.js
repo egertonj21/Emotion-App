@@ -10,6 +10,7 @@ router.post('/login', controller.postLoginRoute);
 router.get('/logEmotion', controller.getLogEmotionRoute);
 router.post('/logEmotions', controller.postEmotionRoute);
 router.get('/emotionLog', controller.getEmotionForUser);
-router.put('/putTriggers', controller.putTriggers);
+router.get('/editEmotion/:emotion_id', controller.getEdit);
+router.post('/putTriggers', controller.putTriggers);
 
 module.exports = router;

@@ -93,16 +93,27 @@ exports.getEmotionForUser = (req, res) => {
 }
 
 exports.putTriggers = (req, res) => {
-    console.log('triggered');
     const { emotion_id, triggers } = req.body;
     const apiUrl = `http://localhost:3002/emotion/updatetrigger`;
-    axios.put(apiUrl, { emotion_id, triggers})
+    console.log(emotion_id);
+    console.log(triggers);
+
+    axios.put(apiUrl, { emotion_id, triggers })
         .then(response => {
             // Check the response status or data to ensure the update was successful
-            res.status(200).json({ message: 'Triggers updated successfully' });
+            // res.status(200).json({ message: 'Triggers updated successfully' });
+            res.render('view');
         })
         .catch(error => {
             console.error('Error making edit', error);
             res.status(500).json({ error: 'An error occurred while updating triggers' });
-        })
+        });
+};
+
+
+exports.getEdit = (req, res) => {
+    const emotion_id = req.params.emotion_id;
+    // const { triggers } = req.body;
+    
+    res.render('editEmotion', {emotion_id})
 }
