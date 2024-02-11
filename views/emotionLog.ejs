@@ -38,10 +38,8 @@
                     <input type="text" id="editTriggers_<%= emotion.emotion_id %>" style="display: none;" value="<%= emotion.triggers %>">
                 </td>
                 <td>
-                    <!-- <button data-action="edit" data-emotion-id="<%= emotion.emotion_id %>">Edit</button>
-                    <button data-action="save" data-emotion-id="<%= emotion.emotion_id %>" style="display: none;">Save</button>
-                    <button onclick="saveTriggers('<%= emotion.emotion_id %>')" style="display: none;">Save</button> -->
                     <a href="/editEmotion/<%= emotion.emotion_id %>">Edit</a>
+                    <a href="/deleteEmotion/<%= emotion.emotion_id %>">Delete</a>
                 </td>
             </tr>
         <% }); %>

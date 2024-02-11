@@ -117,3 +117,24 @@ exports.getEdit = (req, res) => {
     
     res.render('editEmotion', {emotion_id})
 }
+
+exports.getDelete = (req, res) => {
+    const emotion_id = req.params.emotion_id;
+    // const { triggers } = req.body;
+    
+    res.render('deleteEmotion', {emotion_id})
+}
+
+exports.deleteDelete = (req, res) => {
+    const { emotion_id }  = req.body;
+    const apiUrl = `http://localhost:3002/emotion/delete/${emotion_id}`;
+    console.log('Emotion to be deleted' + emotion_id);
+    axios.delete(apiUrl)
+        .then(response => {
+            res.render('view');
+        })
+        .catch(error => {
+            console.error('Error deleting Log', error);
+            res.status(500).json({ error: 'An error occured deleting the log'});
+        });
+}
