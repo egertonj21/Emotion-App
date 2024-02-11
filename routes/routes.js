@@ -9,5 +9,6 @@ router.get('/login', controller.getLoginRoute);
 router.post('/login', controller.postLoginRoute);
 router.get('/logEmotion', controller.getLogEmotionRoute);
 router.post('/logEmotion', controller.postEmotionRoute);
+router.get('/emotionLog', controller.getEmotionForUser);
 
 module.exports = router;

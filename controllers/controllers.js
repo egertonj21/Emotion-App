@@ -75,3 +75,16 @@ exports.postEmotionRoute = (req, res) => {
             res.render('view', {error: 'An error occured'});
         })
 }
+
+exports.getEmotionForUser = (req, res) => {
+    const { user_id } = req.session.user_id;
+    const apiUrl = `http://localhost:3002/emotion/user/${user_id}`;
+    axios.get(apiUrl, {user_id})
+        .then(response => {
+            res.render('emotionLog', {enjoyment, sadness, anger, contempt, disgust, fear, surprise, triggers})
+        })
+        .catch(error => {
+            console.error('Error during request', error);
+            res.render('view', {error: 'An error occured'});
+        })
+}
