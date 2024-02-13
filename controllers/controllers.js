@@ -130,7 +130,7 @@ exports.deleteDelete = (req, res) => {
     const apiUrl = `http://localhost:3002/emotion/delete/${emotion_id}`;
     console.log('Emotion to be deleted' + emotion_id);
     axios.delete(apiUrl)
-        .then(response => {
+        .then(() => {
             res.render('view');
         })
         .catch(error => {
