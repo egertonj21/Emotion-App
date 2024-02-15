@@ -14,5 +14,7 @@ router.get('/editEmotion/:emotion_id', controller.getEdit);
 router.get('/deleteEmotion/:emotion_id', controller.getDelete);
 router.post('/putTriggers', controller.putTriggers);
 router.post('/deleteEmotion', controller.deleteDelete);
+router.get('/register', controller.getRegisterRoute);
+router.post('/register', controller.postRegisterRoute);
 
 module.exports = router;
