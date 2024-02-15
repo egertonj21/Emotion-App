@@ -9,10 +9,16 @@ exports.getRegisterRoute = (req, res) => {
 }
 
 exports.postRegisterRoute = (req, res) => {
-    const { username, password } = req.body;
+    const { username, password, passwordCheck } = req.body;
+
+    // Check if the passwords match
+    if (password !== passwordCheck) {
+        return res.render('register', { error: 'Passwords do not match' });
+    }
+
     const apiUrl = `http://localhost:3002/emotion/add/user`;
 
-    axios.post(apiUrl, {username, password})
+    axios.post(apiUrl, { username, password })
         .then(response => {
             const responseData = response.data;
             console.log(responseData);
@@ -40,18 +46,18 @@ exports.postRegisterRoute = (req, res) => {
                 res.render('login', { error: "Incorrect Password" });
             }
         })
-        .catch(error =>{
-            if (error.response.status === 401) {
+        .catch(error => {
+            if (error.response && error.response.status === 401) {
                 res.render('login', { error: 'Incorrect username or password' });
             } else if (error.response && error.response.status === 404) {
                 console.log('User not found. Please check your credentials.');
             } else {
-                console.error('Error during login request:', error);
-                res.render('login', { error: 'An error occurred during login' });
+                console.error('Error during registration request:', error);
+                res.render('register', { error: 'An error occurred during registration' });
             }
         });
-        
 }
+
 
 exports.postLoginRoute = (req, res) => {
     console.log('postLoginRoute function called');
