@@ -1,4 +1,9 @@
 const axios = require('axios');
+const emailValidator = require('deep-email-validator');
+
+async function isEmailValid(email) {
+    return emailValidator.validate(email)
+}
 
 exports.getLoginRoute = (req, res) => {
     res.render('login', {error: null});
