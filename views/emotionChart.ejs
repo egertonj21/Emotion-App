@@ -1,0 +1,58 @@
+<!-- emotionChart.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Chart</title>
+    <!-- Include necessary charting library, e.g., Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <canvas id="lineChart"></canvas>
+
+    <script>
+        // Access the emotions data passed from the server
+        // const emotions = <%- JSON.stringify(emotions) %>;
+        console.log('Emotions:', emotions);
+
+        // Extract necessary data for the chart (timestamps, enjoyment, sadness, etc.)
+        const timestamps = emotions.map(emotion => emotion.timestamp);
+        const enjoymentValues = emotions.map(emotion => emotion.enjoyment);
+        // Add similar lines for other emotions...
+
+        // Create a line chart using Chart.js
+        const ctx = document.getElementById('lineChart').getContext('2d');
+        const lineChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: timestamps,
+                datasets: [
+                    {
+                        label: 'Enjoyment',
+                        data: enjoymentValues,
+                        borderColor: 'rgb(255, 99, 132)',
+                        tension: 0.1
+                    },
+                    // Add datasets for other emotions...
+                ]
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'day'
+                        }
+                    },
+                    y: {
+                        min: 0,
+                        max: 10
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
