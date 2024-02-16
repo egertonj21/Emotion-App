@@ -16,5 +16,6 @@ router.post('/putTriggers', controller.putTriggers);
 router.post('/deleteEmotion', controller.deleteDelete);
 router.get('/register', controller.getRegisterRoute);
 router.post('/register', controller.postRegisterRoute);
+router.get('/logout', controller.logoutRoute);
 
 module.exports = router;

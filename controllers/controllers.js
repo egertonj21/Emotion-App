@@ -1,6 +1,8 @@
 const axios = require('axios');
 const emailValidator = require('deep-email-validator');
 
+
+
 async function isEmailValid(email) {
     return emailValidator.validate(email)
 }
@@ -14,13 +16,14 @@ const isAuthenticated = (req, res, next) => {
 };
 
 exports.getLoginRoute = (req, res) => {
-    res.render('login', {error: null});
+    const logoutMessage = req.query.logoutMessage;
+    res.render('login', { error: null, message: logoutMessage });
 };
 
 exports.getRegisterRoute = (req, res) => {
     
     res.render('register', { error: '', passwordStrength: 'Medium', passwordMatch: '' });
-}
+};
 
 
 
@@ -230,3 +233,15 @@ exports.deleteDelete = [isAuthenticated, (req, res) => {
             res.status(500).json({ error: 'An error occured deleting the log'});
         });
 }];
+
+exports.logoutRoute = (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Error destroying session:', err);
+            res.status(500).send('Error logging out');
+        } else {
+            // Redirect to the login page after logout with a logout message
+            res.redirect('/login?logoutMessage=You have been logged out');
+        }
+    });
+};
