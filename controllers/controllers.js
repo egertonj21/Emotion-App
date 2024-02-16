@@ -5,6 +5,14 @@ async function isEmailValid(email) {
     return emailValidator.validate(email)
 }
 
+const isAuthenticated = (req, res, next) => {
+    if (req.session.isLoggedIn && req.session.user_id) {
+        next(); // User is authenticated, proceed to the next middleware/route handler
+    } else {
+        res.render('login', { error: 'You are either not logged in, or your session has timed out, please log in.' });
+    }
+};
+
 exports.getLoginRoute = (req, res) => {
     res.render('login', {error: null});
 };
@@ -138,16 +146,16 @@ exports.getDefaultRoute = (req, res) =>{
     res.render('login', {error:null});
 };
 
-exports.getLogEmotionRoute = (req, res) => {
+exports.getLogEmotionRoute = [isAuthenticated, (req, res) => {
     const user_id = req.session.user_id; // Retrieve user_id from session
     if (!user_id) {
         return res.render('login', { error: 'User not logged in' });
     }else{
         res.render('logEmotion',  { user_id });
     }
-}
+}];
 
-exports.postEmotionRoute = (req, res) => {
+exports.postEmotionRoute = [isAuthenticated, (req, res) => {
     const apiUrl = `http://localhost:3002/emotion/add/emotion`;
     const { enjoyment, sadness, anger, contempt, disgust, fear, surprise, triggers} = req.body;
     const user_id = req.session.user_id;
@@ -159,9 +167,9 @@ exports.postEmotionRoute = (req, res) => {
             console.error('Error during request', error);
             res.render('view', {error: 'An error occured'});
         })
-}
+}];
 
-exports.getEmotionForUser = (req, res) => {
+exports.getEmotionForUser = [isAuthenticated, (req, res) => {
     const user_id = req.session.user_id;
     const apiUrl = `http://localhost:3002/emotion/user/${user_id}`;
     axios.get(apiUrl)
@@ -175,9 +183,9 @@ exports.getEmotionForUser = (req, res) => {
             console.error('Error during request', error);
             res.render('view', {error: 'An error occured'});
         })
-}
+}];
 
-exports.putTriggers = (req, res) => {
+exports.putTriggers = [isAuthenticated, (req, res) => {
     const { emotion_id, triggers } = req.body;
     const apiUrl = `http://localhost:3002/emotion/updatetrigger`;
     console.log(emotion_id);
@@ -193,24 +201,24 @@ exports.putTriggers = (req, res) => {
             console.error('Error making edit', error);
             res.status(500).json({ error: 'An error occurred while updating triggers' });
         });
-};
+}];
 
 
-exports.getEdit = (req, res) => {
+exports.getEdit = [isAuthenticated, (req, res) => {
     const emotion_id = req.params.emotion_id;
     // const { triggers } = req.body;
     
     res.render('editEmotion', {emotion_id})
-}
+}];
 
-exports.getDelete = (req, res) => {
+exports.getDelete = [isAuthenticated, (req, res) => {
     const emotion_id = req.params.emotion_id;
     // const { triggers } = req.body;
     
     res.render('deleteEmotion', {emotion_id})
-}
+}];
 
-exports.deleteDelete = (req, res) => {
+exports.deleteDelete = [isAuthenticated, (req, res) => {
     const { emotion_id }  = req.body;
     const apiUrl = `http://localhost:3002/emotion/delete/${emotion_id}`;
     console.log('Emotion to be deleted' + emotion_id);
@@ -222,4 +230,4 @@ exports.deleteDelete = (req, res) => {
             console.error('Error deleting Log', error);
             res.status(500).json({ error: 'An error occured deleting the log'});
         });
-}
+}];
