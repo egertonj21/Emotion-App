@@ -7,6 +7,16 @@
     <title>Menu</title>
 </head>
 <body>
+    <% if (error) { %>
+        <div class="alert alert-danger" role="alert">
+            <%= error %>
+        </div>
+    <% } %>
+    <% if (message) { %>
+        <div class="alert alert-info" role="alert">
+            <%= message %>
+        </div>
+    <% } %>
     <div class="list-group">
         <a href="./logEmotion" class="list-group-item list-group-item-action list-group-item-primary">Log Emotion</a>
         <a href="./emotionLog" class="list-group-item list-group-item-action list-group-item-primary">View Emotions</a>

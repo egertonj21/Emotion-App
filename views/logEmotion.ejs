@@ -7,6 +7,16 @@
     <title>Log Emotions</title>
 </head>
 <body>
+    <% if (error) { %>
+        <div class="alert alert-danger" role="alert">
+            <%= error %>
+        </div>
+    <% } %>
+    <% if (message) { %>
+        <div class="alert alert-info" role="alert">
+            <%= message %>
+        </div>
+    <% } %>
     <form method="post" action="/logEmotions">
         <div class = "container">
             <label for="enjoymentRange">Enjoyment:</label>

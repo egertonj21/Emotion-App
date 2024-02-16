@@ -7,6 +7,16 @@
     <title>Emotion Logs</title>
 </head>
 <body>
+    <% if (error) { %>
+        <div class="alert alert-danger" role="alert">
+            <%= error %>
+        </div>
+    <% } %>
+    <% if (message) { %>
+        <div class="alert alert-info" role="alert">
+            <%= message %>
+        </div>
+    <% } %>
     <table id="emotionTable" border="1">
         <tr>
             <th>Id</th>
