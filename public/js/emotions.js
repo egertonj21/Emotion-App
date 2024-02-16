@@ -1,3 +1,6 @@
+
+
+
 document.addEventListener('DOMContentLoaded', function () {
     console.log('DOM Content Loaded');
     // Set up event listeners for emotion ranges

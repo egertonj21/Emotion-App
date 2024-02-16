@@ -24,7 +24,8 @@
                 <div class="col">
                     <div class="form-group">
                         <label for="password">Enter Password</label>
-                        <input type="password" class="form-control" id="formGroupExampleInput2" placeholder="Password" name="password">
+                        <input type="password" class="form-control" id="password" placeholder="Password" name="password" oninput="checkPasswordStrength(this.value)">
+                        <div id="password-strength" class="strength-indicator" style="display: none;" name="passwordStrength"><%= passwordStrength %></div>
                     </div>
                 </div>
             </div>
@@ -32,7 +33,8 @@
                 <div class="col">
                     <div class="form-group">
                         <label for="passwordCheck">Re-Enter Password</label>
-                        <input type="password" class="form-control" id="formGroupExampleInput2" placeholder="Password" name="passwordCheck">
+                        <input type="password" class="form-control" id="passwordCheck" placeholder="Password" name="passwordCheck" oninput="checkPasswordMatch(this.value)">
+                        <div id="password-match" class="strength-indicator" style="display: none;" name="passwordMatch"><%= passwordMatch %></div>
                     </div>
                 </div>
             </div>
@@ -53,6 +55,7 @@
         </div>
     </div>
 
+    <script src="/js/register.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
 </html>

@@ -10,7 +10,9 @@ exports.getLoginRoute = (req, res) => {
 };
 
 exports.getRegisterRoute = (req, res) => {
-    res.render('register', {error: null});
+    const initialPasswordStrength = 'Medium';
+    const initialPasswordMatch = '';
+    res.render('register', { error: '', passwordStrength: 'Medium', passwordMatch: '' });
 }
 
 
@@ -29,7 +31,7 @@ exports.postRegisterRoute = async (req, res) => {
     if (valid) {
         // Check if the passwords match
         if (password !== req.body.passwordCheck) {
-            return res.render('register', { error: 'Passwords do not match' });
+            return res.render('register', { error: 'Passwords do not match', passwordStrength: 'Medium', passwordMatch: ''});
         }
 
         // Check if the email is already taken
@@ -37,7 +39,7 @@ exports.postRegisterRoute = async (req, res) => {
         axios.post(userApiUrl)
             .then(response => {
                 const userData = response.data;
-                return res.render('register', { error: 'Email already taken' });
+                return res.render('register', { error: 'Email already taken', passwordStrength: 'Medium', passwordMatch: '' });
             })
             .catch(error => {
                 const apiUrl = `http://localhost:3002/emotion/add/user`;
@@ -76,12 +78,12 @@ exports.postRegisterRoute = async (req, res) => {
                             console.log('User not found. Please check your credentials.');
                         } else {
                             console.error('Error during registration request:', registrationError);
-                            res.render('register', { error: 'An error occurred during registration' });
+                            res.render('register', { error: 'An error occurred during registration', passwordStrength: 'Medium', passwordMatch: '' });
                         }
                     });
             });
     } else {
-        return res.render('register', {error:"Please provide a valid email address."});         
+        return res.render('register', {error:"Please provide a valid email address.", passwordStrength: 'Medium', passwordMatch: ''});         
     }
 };
 
