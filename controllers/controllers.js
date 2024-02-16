@@ -18,8 +18,7 @@ exports.getLoginRoute = (req, res) => {
 };
 
 exports.getRegisterRoute = (req, res) => {
-    const initialPasswordStrength = 'Medium';
-    const initialPasswordMatch = '';
+    
     res.render('register', { error: '', passwordStrength: 'Medium', passwordMatch: '' });
 }
 
