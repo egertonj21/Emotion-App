@@ -20,5 +20,6 @@ router.get('/logout', controller.logoutRoute);
 router.get('/emotionChart', controller.getEmotionChart);
 router.get('/loginOut', controller.getLoginFromLogoutRoute);
 router.get('/view', controller.getViewRoute);
+router.post('/filterByDate', controller.emotionForUserbyDate);
 
 module.exports = router;

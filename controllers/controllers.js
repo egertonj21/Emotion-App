@@ -306,3 +306,22 @@ exports.getEmotionChart = [isAuthenticated, async (req, res) => {
         res.render('view', { error: 'An error occurred while fetching emotion data', message: null });
     }
 }];
+
+exports.emotionForUserbyDate = [isAuthenticated, (req, res) => {
+    const user_id = req.session.user_id;
+    const startDate = req.body.startDate;
+    const endDate = req.body.endDate;
+    console.log(startDate, endDate);
+    const apiUrl = `http://localhost:3002/emotion/userByDate/${user_id}`;
+    axios.get(apiUrl, { params: { startDate, endDate } })
+        .then(response => {
+            const emotions = response.data.result;
+            console.log(startDate, endDate);
+            
+            res.render('emotionLog', { emotions, error: null, message: null })
+        })
+        .catch(error => {
+            console.error('Error during request', error);
+            res.render('view', {error: 'No logs for selected dates', message: null});
+        })
+}];
