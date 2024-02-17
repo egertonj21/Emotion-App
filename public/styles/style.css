@@ -1,0 +1,106 @@
+/* Custom styles for range inputs */
+body{
+    background-color: lightskyblue;
+    padding-bottom: 60px;
+}
+#header {
+    background-color: lightgreen !important;
+}
+
+
+input[type="range"] {
+    /* Hide the default track */
+    
+    width: 100%; /* Adjust the width as needed */
+    height: 15px;
+    /* margin: 5px auto; Adjust margin for centering */
+}
+
+/* Custom styles for range input labels */
+.form-label {
+    display: block;
+    text-align: center;
+}
+
+/* Custom styles for range input containers */
+.mb-3.text-center {
+    text-align: center;
+}
+
+/* Custom styles for range input spans */
+span {
+    display: block;
+    text-align: center;
+    margin-top: 5px; /* Adjust as needed */
+}
+
+/* Track styles for each emotion */
+input[type="range"]#enjoymentRange::-webkit-slider-runnable-track {
+    background: #FFD700; /* Gold */
+}
+
+input[type="range"]#sadnessRange::-webkit-slider-runnable-track {
+    background: #0000FF; /* Blue */
+}
+
+input[type="range"]#angerRange::-webkit-slider-runnable-track {
+    background: #FF0000; /* Red */
+}
+
+input[type="range"]#contemptRange::-webkit-slider-runnable-track {
+    background: #808080; /* Gray */
+}
+
+input[type="range"]#disgustRange::-webkit-slider-runnable-track {
+    background: #008000; /* Green */
+}
+
+input[type="range"]#fearRange::-webkit-slider-runnable-track {
+    background: #800080; /* Purple */
+}
+
+input[type="range"]#surpriseRange::-webkit-slider-runnable-track {
+    background: #FFA500; /* Orange */
+}
+
+/* Thumb styles */
+input[type="range"]::-webkit-slider-thumb {
+    /* Set thumb color */
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: black; /* Gold - Change this color to match the track */
+    border-radius: 50%;
+    cursor: pointer;
+    margin-top: -6px; /* Adjust to center thumb vertically */
+    margin-left: 0px; /* Adjust to center thumb horizontally */
+}
+span {
+    display: block;
+    text-align: center;
+    margin-top: 5px; /* Adjust as needed */
+    width: 20px; /* Set the width according to your preference */
+    margin: 0 auto; /* Center the span */
+    overflow: hidden; /* Hide overflow text */
+    white-space: nowrap; /* Prevent wrapping */
+    text-overflow: ellipsis; /* Show ellipsis if text overflows */
+}
+/* Add gridlines to table */
+.table {
+    border-collapse: collapse;
+}
+
+.table th,
+.table td {
+    border: 1px solid #050708;
+    padding: 8px;
+    text-align: center;
+}
+
+tr:hover {
+    background-color: #d41919 !important;
+}
+.btn-submit {
+    margin-top: 30px !important; /* Adjust the value as needed */
+}
+

@@ -1,6 +1,6 @@
 const axios = require('axios');
 const emailValidator = require('deep-email-validator');
-
+const dayjs = require('dayjs');
 
 
 async function isEmailValid(email) {
@@ -185,15 +185,18 @@ exports.getEmotionForUser = [isAuthenticated, (req, res) => {
     const apiUrl = `http://localhost:3002/emotion/user/${user_id}`;
     axios.get(apiUrl)
         .then(response => {
-            const emotions = response.data.result;
-            // console.log(emotions);
+            const emotions = response.data.result.map(emotion => {
+                // Format the timestamp of each emotion to a human-readable format
+                emotion.timestamp = dayjs(emotion.timestamp).format("YYYY-MM-DD HH:mm:ss");
+                return emotion;
+            });
             
-            res.render('emotionLog', { emotions, error: null, message: null })
+            res.render('emotionLog', { emotions, error: null, message: null });
         })
         .catch(error => {
             console.error('Error during request', error);
-            res.render('view', {error: 'An error occured', message: null});
-        })
+            res.render('view', {error: 'An error occurred', message: null});
+        });
 }];
 
 exports.putTriggers = [isAuthenticated, (req, res) => {
@@ -282,7 +285,8 @@ exports.getEmotionChart = [isAuthenticated, async (req, res) => {
             disgustArray.push(emotion.disgust);
             fearArray.push(emotion.fear);
             surpriseArray.push(emotion.surprise);
-            xlabels.push(emotion.timestamp);
+            const formattedTimestamp = dayjs(emotion.timestamp).format('YYYY-MM-DD HH:mm:ss');
+            xlabels.push(formattedTimestamp);
             }
         res.render('emotionChart', {
             emotions: emotions, // Pass the emotions data fetched from the API
@@ -311,17 +315,26 @@ exports.emotionForUserbyDate = [isAuthenticated, (req, res) => {
     const user_id = req.session.user_id;
     const startDate = req.body.startDate;
     const endDate = req.body.endDate;
-    console.log(startDate, endDate);
+
+    // Format the dates to UK date format (DD/MM/YYYY)
+    const formattedStartDate = dayjs(startDate).format('YYYY-MM-DD');
+    const formattedEndDate = dayjs(endDate).format('YYYY-MM-DD');
+
+    console.log(formattedStartDate, formattedEndDate);
+
     const apiUrl = `http://localhost:3002/emotion/userByDate/${user_id}`;
-    axios.get(apiUrl, { params: { startDate, endDate } })
+    axios.get(apiUrl, { params: { startDate: formattedStartDate, endDate: formattedEndDate } })
         .then(response => {
-            const emotions = response.data.result;
-            console.log(startDate, endDate);
+            const emotions = response.data.result.map(emotion => {
+                // Format the timestamp of each emotion to a human-readable format
+                emotion.timestamp = dayjs(emotion.timestamp).format("YYYY-MM-DD HH:mm:ss");
+                return emotion;
+            });
             
-            res.render('emotionLog', { emotions, error: null, message: null })
+            res.render('emotionLog', { emotions, error: null, message: null });
         })
         .catch(error => {
             console.error('Error during request', error);
-            res.render('view', {error: 'No logs for selected dates', message: null});
-        })
+            res.render('view', { error: 'No logs for selected dates', message: null });
+        });
 }];
