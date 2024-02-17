@@ -259,7 +259,44 @@ exports.getEmotionChart = [isAuthenticated, async (req, res) => {
         const emotions = response.data.result;
         
         // Render the emotionChart.ejs file and pass the fetched data to it
-        res.render('emotionChart', { emotions, error: null, message: null });
+        
+        console.log(emotions);
+        const enjoymentArray = [];
+        const sadnessArray = [];
+        const angerArray = [];
+        const contemptArray = [];
+        const disgustArray = [];
+        const fearArray = [];
+        const surpriseArray = [];
+        const xlabels = [];
+        for (let i = 0; i < emotions.length; i++) {
+            const emotion = emotions[i];
+            enjoymentArray.push(emotion.enjoyment);
+            sadnessArray.push(emotion.sadness);
+            angerArray.push(emotion.anger);
+            contemptArray.push(emotion.contempt);
+            disgustArray.push(emotion.disgust);
+            fearArray.push(emotion.fear);
+            surpriseArray.push(emotion.surprise);
+            xlabels.push(emotion.timestamp);
+            }
+        res.render('emotionChart', {
+            emotions: emotions, // Pass the emotions data fetched from the API
+            enjoymentArray: enjoymentArray,
+            sadnessArray: sadnessArray,
+            angerArray: angerArray,
+            contemptArray: contemptArray,
+            disgustArray: disgustArray,
+            fearArray: fearArray,
+            surpriseArray: surpriseArray,
+            xlabels: xlabels,
+            error: null,
+            message: null
+        });
+        // console.log(enjoymentArray);
+    
+        // Iterate over the array of emotion objects
+        
     } catch (error) {
         console.error('Error fetching emotion data:', error);
         res.render('view', { error: 'An error occurred while fetching emotion data', message: null });

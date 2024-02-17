@@ -6,53 +6,124 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emotion Chart</title>
-    <!-- Include necessary charting library, e.g., Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" integrity="sha512-ZwR1/gSZM3ai6vCdI+LVF1zSq/5HznD3ZSTk7kajkaj4D292NLuduDCO1c/NT8Id+jE58KYLKT7hXnbtryGmMg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    
+    
 </head>
 <body>
-    <canvas id="lineChart"></canvas>
-
+    <div class ="chart-container" style="position: relative; height: 60vh; width: 80vw">
+    
+        <canvas id="myCanvas"></canvas>
+        
+    </div>
     <script>
-        // Access the emotions data passed from the server
-        // const emotions = <%- JSON.stringify(emotions) %>;
-        console.log('Emotions:', emotions);
-
-        // Extract necessary data for the chart (timestamps, enjoyment, sadness, etc.)
-        const timestamps = emotions.map(emotion => emotion.timestamp);
-        const enjoymentValues = emotions.map(emotion => emotion.enjoyment);
-        // Add similar lines for other emotions...
-
-        // Create a line chart using Chart.js
-        const ctx = document.getElementById('lineChart').getContext('2d');
-        const lineChart = new Chart(ctx, {
+        const enjoymentIt = '<%- JSON.stringify(enjoymentArray) %>';
+        const sadnessIt = '<%- JSON.stringify(sadnessArray) %>';
+        const angerIt = '<%- JSON.stringify(angerArray) %>';
+        const contemptIt = '<%- JSON.stringify(contemptArray) %>';
+        const disgustIt = '<%- JSON.stringify(disgustArray) %>';
+        const fearIt = '<%- JSON.stringify(fearArray) %>';
+        const surpriseIt = '<%- JSON.stringify(surpriseArray) %>';
+        const xlabelsIt = '<%- JSON.stringify(xlabels) %>';
+    
+        const enjoymentValues = JSON.parse(enjoymentIt);
+        const sadnessValues = JSON.parse(sadnessIt);
+        const angerValues = JSON.parse(angerIt);
+        const contemptValues = JSON.parse(contemptIt);
+        const disgustValues = JSON.parse(disgustIt);
+        const fearValues = JSON.parse(fearIt);
+        const surpriseValues = JSON.parse(surpriseIt);
+        const xLabels = JSON.parse(xlabelsIt);
+        
+        const chartdata = {
+            labels: xLabels,
+            datasets: [
+                {
+                    label: 'Enjoyment',
+                    data: enjoymentValues,
+                    borderColor: 'blue',
+                    lineTension: 0,
+                    pointRadius: 6
+                },
+                {
+                    label: 'Sadness',
+                    data: sadnessValues,
+                    borderColor: 'red',
+                    lineTension: 0,
+                    pointRadius: 6
+                },
+                {
+                    label: 'Anger',
+                    data: angerValues,
+                    borderColor: 'orange',
+                    lineTension: 0,
+                    pointRadius: 6
+                },
+                {
+                    label: 'Contempt',
+                    data: contemptValues,
+                    borderColor: 'purple',
+                    lineTension: 0,
+                    pointRadius: 6
+                },
+                {
+                    label: 'Disgust',
+                    data: disgustValues,
+                    borderColor: 'green',
+                    lineTension: 0,
+                    pointRadius: 6
+                },
+                {
+                    label: 'Fear',
+                    data: fearValues,
+                    borderColor: 'yellow',
+                    lineTension: 0,
+                    pointRadius: 6
+                },
+                {
+                    label: 'Surprise',
+                    data: surpriseValues,
+                    borderColor: 'cyan',
+                    lineTension: 0,
+                    pointRadius: 6
+                }
+            ]
+        };
+    
+        const chartconfig = {
             type: 'line',
-            data: {
-                labels: timestamps,
-                datasets: [
-                    {
-                        label: 'Enjoyment',
-                        data: enjoymentValues,
-                        borderColor: 'rgb(255, 99, 132)',
-                        tension: 0.1
-                    },
-                    // Add datasets for other emotions...
-                ]
-            },
+            data: chartdata,
             options: {
+                animation: true,
+                responsive: true,
+                maintainAspectRatio: false,
                 scales: {
-                    x: {
-                        type: 'time',
-                        time: {
-                            unit: 'day'
-                        }
-                    },
                     y: {
                         min: 0,
                         max: 10
                     }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'right'
+                    },
+                    tooltip: {
+                        enabled: true
+                    },
+                    title: {
+                        display: true,
+                        text: 'Emotion Chart',
+                        font: { size: 20 }
+                    }
                 }
             }
-        });
+        };
+    
+        const chart = new Chart('myCanvas', chartconfig);
     </script>
-</body>
+    
+    </body>
 </html>
