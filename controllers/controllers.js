@@ -232,6 +232,13 @@ exports.getDelete = [isAuthenticated, (req, res) => {
     res.render('deleteEmotion', {emotion_id, error: null, message: null})
 }];
 
+exports.getAccountRoute = [isAuthenticated, (req, res) => {
+    
+    // const { triggers } = req.body;
+    
+    res.render('account', {error: null, message: null})
+}];
+
 exports.deleteDelete = [isAuthenticated, (req, res) => {
     const { emotion_id }  = req.body;
     const apiUrl = `http://localhost:3002/emotion/delete/${emotion_id}`;
