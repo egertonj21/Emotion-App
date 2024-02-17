@@ -19,5 +19,6 @@ router.post('/register', controller.postRegisterRoute);
 router.get('/logout', controller.logoutRoute);
 router.get('/emotionChart', controller.getEmotionChart);
 router.get('/loginOut', controller.getLoginFromLogoutRoute);
+router.get('/view', controller.getViewRoute);
 
 module.exports = router;

@@ -153,6 +153,10 @@ exports.getDefaultRoute = (req, res) =>{
     res.render('login', {error:null, message: null});
 };
 
+exports.getViewRoute = [isAuthenticated, (req, res) => {
+    res.render('view', {error:null, message: null});
+}]
+
 exports.getLogEmotionRoute = [isAuthenticated, (req, res) => {
     const user_id = req.session.user_id; // Retrieve user_id from session
     if (!user_id) {
