@@ -427,7 +427,7 @@ exports.emotionForUserbyDate = [isAuthenticated, (req, res) => {
         })
         .catch(error => {
             console.error('Error during request', error);
-            res.render('view', { error: 'No logs for selected dates', message: null, username });
+            res.render('emotionLog', { emotions: [], error: 'No logs for selected dates', message: null, username });
         });
 }];
 
