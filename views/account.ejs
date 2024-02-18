@@ -8,6 +8,7 @@
 </head>
 <body>
     <%- include("partials/header.ejs") %>
+    
     <% if (error) { %>
         <div class="alert alert-danger" role="alert">
             <%= error %>
@@ -20,8 +21,9 @@
     <% } %>
     <div class="list-group">
         <a href="./passwordChange" class="list-group-item list-group-item-action list-group-item-primary">Change Password</a>
-        <a href="./" class="list-group-item list-group-item-action list-group-item-primary">Clear Emotion Logs</a>
+        <a href="./deleteEmotions" class="list-group-item list-group-item-action list-group-item-primary">Clear Emotion Logs</a>
         <a href="./" class="list-group-item list-group-item-action list-group-item-primary">Clear Logs & Delete Account</a>
+        <a href="./view" class="list-group-item list-group-item-action list-group-item-primary">Back to Main Menu</a>
         <a href="./logout" class="list-group-item list-group-item-action list-group-item-primary">Log Out</a>
     </div>
 

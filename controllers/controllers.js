@@ -191,21 +191,38 @@ exports.getEmotionForUser = [isAuthenticated, (req, res) => {
     const user_id = req.session.user_id;
     const username = req.session.email;
     const apiUrl = `http://localhost:3002/emotion/user/${user_id}`;
+    
     axios.get(apiUrl)
         .then(response => {
-            const emotions = response.data.result.map(emotion => {
-                // Format the timestamp of each emotion to a human-readable format
-                emotion.timestamp = dayjs(emotion.timestamp).format("YYYY-MM-DD HH:mm:ss");
-                return emotion;
-            });
-            
-            res.render('emotionLog', { emotions, error: null, message: null, username });
+            if (response.data.status === 'success') {
+                const emotions = response.data.result.map(emotion => {
+                    // Format the timestamp of each emotion to a human-readable format
+                    emotion.timestamp = dayjs(emotion.timestamp).format("YYYY-MM-DD HH:mm:ss");
+                    return emotion;
+                });
+                
+                if (emotions.length > 0) {
+                    res.render('emotionLog', { emotions, error: null, message: null, username });
+                } else {
+                    res.render('emotionLog', { emotions: [], error: 'No emotion records found for the user', message: null, username });
+                }
+            } else if (response.status === 404) {
+                res.render('emotionLog', { emotions: [], error: 'No emotion records found for the user', message: null, username });
+            } else {
+                throw new Error('Unexpected response from server');
+            }
         })
         .catch(error => {
-            console.error('Error during request', error);
-            res.render('view', {error: 'An error occurred', message: null, username});
+            if (error.response && error.response.status === 404) {
+                res.render('emotionLog', { emotions: [], error: 'No emotion records found for the user', message: null, username });
+            } else {
+                console.error('Error during request', error);
+                res.render('view', { error: 'An error occurred', message: null, username });
+            }
         });
 }];
+
+
 
 exports.putTriggers = [isAuthenticated, (req, res) => {
     const { emotion_id, triggers } = req.body;
@@ -276,9 +293,10 @@ exports.getDelete = [isAuthenticated, (req, res) => {
 
 exports.getAccountRoute = [isAuthenticated, (req, res) => {
     const username = req.session.email;
+    const user_id = req.session.user_id;
     // const { triggers } = req.body;
     
-    res.render('account', {error: null, message: null, username})
+    res.render('account', {error: null, message: null, username, user_id})
 }];
 
 exports.getPasswordChangeRoute = [isAuthenticated, (req, res) => {
@@ -322,9 +340,7 @@ exports.getEmotionChart = [isAuthenticated, async (req, res) => {
         const response = await axios.get(apiUrl);
         const emotions = response.data.result;
         const username = req.session.email;
-        // Render the emotionChart.ejs file and pass the fetched data to it
-        
-        console.log(emotions);
+
         const enjoymentArray = [];
         const sadnessArray = [];
         const angerArray = [];
@@ -333,6 +349,7 @@ exports.getEmotionChart = [isAuthenticated, async (req, res) => {
         const fearArray = [];
         const surpriseArray = [];
         const xlabels = [];
+
         for (let i = 0; i < emotions.length; i++) {
             const emotion = emotions[i];
             enjoymentArray.push(emotion.enjoyment);
@@ -344,9 +361,10 @@ exports.getEmotionChart = [isAuthenticated, async (req, res) => {
             surpriseArray.push(emotion.surprise);
             const formattedTimestamp = dayjs(emotion.timestamp).format('YYYY-MM-DD HH:mm:ss');
             xlabels.push(formattedTimestamp);
-            }
+        }
+
         res.render('emotionChart', {
-            emotions: emotions, // Pass the emotions data fetched from the API
+            emotions: emotions,
             enjoymentArray: enjoymentArray,
             sadnessArray: sadnessArray,
             angerArray: angerArray,
@@ -359,16 +377,30 @@ exports.getEmotionChart = [isAuthenticated, async (req, res) => {
             message: null,
             username
         });
-        // console.log(enjoymentArray);
-    
-        // Iterate over the array of emotion objects
-        
     } catch (error) {
         const username = req.session.email;
         console.error('Error fetching emotion data:', error);
-        res.render('view', { error: 'An error occurred while fetching emotion data', message: null, username });
+        if (error.response && error.response.status === 404) {
+            res.render('emotionChart', {
+                emotions: [],
+                enjoymentArray: [],
+                sadnessArray: [],
+                angerArray: [],
+                contemptArray: [],
+                disgustArray: [],
+                fearArray: [],
+                surpriseArray: [],
+                xlabels: [],
+                error: 'No emotion records found for the user',
+                message: null,
+                username
+            });
+        } else {
+            res.render('view', { error: 'An error occurred while fetching emotion data', message: null, username });
+        }
     }
 }];
+
 
 exports.emotionForUserbyDate = [isAuthenticated, (req, res) => {
     const user_id = req.session.user_id;
@@ -430,4 +462,52 @@ exports.putPasswordChange = async (req, res) => {
         return res.status(500).json({ error: 'An error occurred while changing password.' });
     }
 };
+
+exports.deleteEmotions = async (req, res) => {
+    const user_id = req.session.user_id;
+    const username = req.body.email;
+    console.log(user_id);
+    const apiUrl = `http://localhost:3002/emotion/deleteEmotion/${user_id}`;
+
+    try {
+        const response = await axios.delete(apiUrl, { user_id: { user_id } });
+        res.render('account', { error: null, message: null, username, user_id });
+    } catch (error) {
+        console.error('Error deleting logs', error);
+        res.render('account', { error: 'Could not delete logs', message: null, username, user_id });
+    }
+}
+
+
+exports.getDeleteEmotionsRoute = [isAuthenticated, (req, res) => {
+    const user_id = req.session.user_id;
+    const username = req.session.email;
+    const apiUrl = `http://localhost:3002/emotion/user/${user_id}`;
+    
+    axios.get(apiUrl)
+        .then(response => {
+            if (response.data.status === 'success') {
+                const emotions = response.data.result.map(emotion => {
+                    // Format the timestamp of each emotion to a human-readable format
+                    emotion.timestamp = dayjs(emotion.timestamp).format("YYYY-MM-DD HH:mm:ss");
+                    return emotion;
+                });
+                
+                res.render('deleteEmotions', { emotions, error: null, message: null, username, user_id });
+            } else if (response.status === 404) {
+                res.render('deleteEmotions', { emotions: [], error: 'No emotion records found for the user', message: null, username, user_id });
+            } else {
+                throw new Error('Unexpected response from server');
+            }
+        })
+        .catch(error => {
+            if (error.response && error.response.status === 404) {
+                res.render('deleteEmotions', { emotions: [], error: 'No emotion records found for the user', message: null, username, user_id });
+            }else{
+            console.error('Error during request', error);
+            res.render('account', { error: 'An error occurred', message: null, username });
+            }
+        });
+}];
+
 

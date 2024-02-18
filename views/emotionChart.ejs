@@ -15,6 +15,17 @@
 </head>
 <body>
     <%- include("partials/header.ejs") %>
+
+    <% if (error) { %>
+        <div class="alert alert-danger" role="alert">
+            <%= error %>
+        </div>
+    <% } %>
+    <% if (message) { %>
+        <div class="alert alert-info" role="alert">
+            <%= message %>
+        </div>
+    <% } %>
     <div class ="chart-container" style="position: relative; height: 60vh; width: 80vw">
     
         <canvas id="myCanvas"></canvas>

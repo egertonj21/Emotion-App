@@ -24,5 +24,7 @@ router.post('/filterByDate', controller.emotionForUserbyDate);
 router.get('/account', controller.getAccountRoute);
 router.get('/passwordChange', controller.getPasswordChangeRoute);
 router.post('/changePassword', controller.putPasswordChange);
+router.post('/deleteEmotions', controller.deleteEmotions);
+router.get('/deleteEmotions', controller.getDeleteEmotionsRoute);
 
 module.exports = router;
