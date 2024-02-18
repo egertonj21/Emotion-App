@@ -247,14 +247,32 @@ exports.getEdit = [isAuthenticated, (req, res) => {
         });
 }];
 
-
 exports.getDelete = [isAuthenticated, (req, res) => {
     const emotion_id = req.params.emotion_id;
     const username = req.session.email;
-    // const { triggers } = req.body;
-    
-    res.render('deleteEmotion', {emotion_id, error: null, message: null, username})
+    const apiUrl = `http://localhost:3002/emotion/${emotion_id}`;
+
+    axios.get(apiUrl)
+        .then(response => {
+            const emotion = response.data.result;
+            // Format the timestamp of the emotion to a human-readable format
+            emotion.timestamp = dayjs(emotion.timestamp).format("YYYY-MM-DD HH:mm:ss");
+            const triggers = emotion.triggers;
+            console.log(triggers);
+            res.render('deleteEmotion', { emotion, emotion_id, triggers, error: null, message: "Please note you will be unable to recover this once deleted, proceed with caution", username });
+        })
+        .catch(error => {
+            console.error('Error rendering page', error);
+            res.status(500).json({ error: 'An error occurred while loading the specified emotion log', message: null, username });
+        });
 }];
+// exports.getDelete = [isAuthenticated, (req, res) => {
+//     const emotion_id = req.params.emotion_id;
+//     const username = req.session.email;
+//     // const { triggers } = req.body;
+    
+//     res.render('deleteEmotion', {emotion_id, error: null, message: null, username})
+// }];
 
 exports.getAccountRoute = [isAuthenticated, (req, res) => {
     const usernmame = req.session.email;
