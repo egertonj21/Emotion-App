@@ -510,4 +510,33 @@ exports.getDeleteEmotionsRoute = [isAuthenticated, (req, res) => {
         });
 }];
 
+exports.getWipeout = [isAuthenticated, (req, res) => {
+    const username = req.session.email;
+    // const { triggers } = req.body;
+    
+    res.render('wipeout', { error: '', message: null, username: null })
+}];
 
+exports.deleteAll = async (req, res) => {
+    const user_id = req.session.user_id;
+    const username = req.session.email;
+    console.log(user_id);
+    const apiUrl = `http://localhost:3002/emotion/deleteuser/${user_id}`;
+
+    try {
+        const response = await axios.delete(apiUrl, { data: { user_id } });
+        // Destroy the session
+        req.session.destroy((err) => {
+            if (err) {
+                console.error('Error destroying session:', err);
+                res.status(500).send('Error logging out');
+            } else {
+                // Redirect the user to the login screen with a success message
+                res.render('login', { message: 'Account deleted successfully', error: '', username: '' });
+            }
+        });
+    } catch (error) {
+        console.error('Error deleting account', error);
+        res.render('account', { error: 'Could not delete account', message: null, username, user_id });
+    }
+}

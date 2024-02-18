@@ -26,5 +26,7 @@ router.get('/passwordChange', controller.getPasswordChangeRoute);
 router.post('/changePassword', controller.putPasswordChange);
 router.post('/deleteEmotions', controller.deleteEmotions);
 router.get('/deleteEmotions', controller.getDeleteEmotionsRoute);
+router.get('/wipeout', controller.getWipeout);
+router.post('/deleteAll', controller.deleteAll);
 
 module.exports = router;
