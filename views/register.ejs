@@ -8,7 +8,11 @@
 </head>
 <body>
     <%- include("partials/header.ejs") %>
-    <h1><%= error %></h1>
+    <% if (error) { %>
+        <div class="alert alert-danger" role="alert">
+            <%= error %>
+        </div>
+    <% } %>
     <form method="POST" action="/register">
         <div class="container">
             <div class="row">

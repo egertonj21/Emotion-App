@@ -3,7 +3,7 @@ const morgan = require('morgan');
 const dotenv = require('dotenv').config({ path: './config.env' });
 const session = require('express-session');
 const router = require('./routes/routes');
-// const helmet = require('helmet');
+const helmet = require('helmet');
 var path = require('path');
 
 const app = express();
@@ -22,16 +22,16 @@ app.use(morgan('tiny'));
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
-// app.use(helmet());
-// app.use(
-//     helmet.contentSecurityPolicy({
-//     directives: {
-//         defaultSrc: ["'self'"],
-//         scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'https://cdn.jsdelivr.net'],
-//         // Add other directives as needed
-//     },
-//     })
-// );
+app.use(helmet());
+app.use(
+    helmet.contentSecurityPolicy({
+    directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'https://cdn.jsdelivr.net'],
+        // Add other directives as needed
+    },
+    })
+);
 
 app.use('/', router);
 
