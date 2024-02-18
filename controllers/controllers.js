@@ -11,30 +11,30 @@ const isAuthenticated = (req, res, next) => {
     if (req.session.isLoggedIn && req.session.user_id) {
         next(); // User is authenticated, proceed to the next middleware/route handler
     } else {
-        res.render('login', { error: 'You are either not logged in, or your session has timed out, please log in.', message: null });
+        res.render('login', { error: 'You are either not logged in, or your session has timed out, please log in.', message: null, username: null });
     }
 };
 
 exports.getLoginRoute = (req, res) => {
     
-    res.render('login', { error: null, message: null });
+    res.render('login', { error: null, message: null, username: null });
 };
 
 exports.getLoginFromLogoutRoute = (req, res) => {
     const logoutMessage = req.query.logoutMessage;
-    res.render('login', { error: null, message: logoutMessage });
+    res.render('login', { error: null, message: logoutMessage, username: null });
 };
 
 exports.getRegisterRoute = (req, res) => {
     
-    res.render('register', { error: '', passwordStrength: 'Medium', passwordMatch: '', message: null });
+    res.render('register', { error: '', passwordStrength: 'Medium', passwordMatch: '', message: null, username: null });
 };
 
 
 
 exports.postRegisterRoute = async (req, res) => {
     const { email, password } = req.body;
-
+    
     if (!email || !password) {
         return res.status(400).send({
             message: "Email or password missing."
@@ -46,7 +46,7 @@ exports.postRegisterRoute = async (req, res) => {
     if (valid) {
         // Check if the passwords match
         if (password !== req.body.passwordCheck) {
-            return res.render('register', { error: 'Passwords do not match', passwordStrength: 'Medium', passwordMatch: '', message: null});
+            return res.render('register', { error: 'Passwords do not match', passwordStrength: 'Medium', passwordMatch: '', message: null, username: null});
         }
 
         // Check if the email is already taken
@@ -54,7 +54,7 @@ exports.postRegisterRoute = async (req, res) => {
         axios.post(userApiUrl)
             .then(response => {
                 const userData = response.data;
-                return res.render('register', { error: 'Email already taken', passwordStrength: 'Medium', passwordMatch: '', message: null });
+                return res.render('register', { error: 'Email already taken', passwordStrength: 'Medium', passwordMatch: '', message: null, username: null });
             })
             .catch(error => {
                 const apiUrl = `http://localhost:3002/emotion/add/user`;
@@ -73,32 +73,33 @@ exports.postRegisterRoute = async (req, res) => {
                                     // Check if the result array is not empty before accessing user_id
                                     const user_id = userData.result.length > 0 ? userData.result[0].user_id : null;
                                     req.session.user_id = user_id; // Set user_id in session
+                                    username = req.session.email;
                                     console.log(req.session);
-                                    res.render('view', { error: null, message: null });
+                                    res.render('view', { error: null, message: null, username });
                                 })
                                 .catch(userError => {
                                     console.error('Error fetching user_id:', userError);
-                                    res.render('login', { error: 'An error occurred while fetching user_id' });
+                                    res.render('login', { error: 'An error occurred while fetching user_id', message: null, username: null });
                                 });
                         } else if (responseData.message === 'User not found') {
-                            res.render('login', { error: "User not found", message: null });
+                            res.render('login', { error: "User not found", message: null, username: null });
                         } else {
-                            res.render('login', { error: "Incorrect Password", message: null });
+                            res.render('login', { error: "Incorrect Password", message: null, username: null });
                         }
                     })
                     .catch(registrationError => {
                         if (registrationError.response && registrationError.response.status === 401) {
-                            res.render('login', { error: 'Incorrect email or password', message: null });
+                            res.render('login', { error: 'Incorrect email or password', message: null, username: null });
                         } else if (registrationError.response && registrationError.response.status === 404) {
                             console.log('User not found. Please check your credentials.');
                         } else {
                             console.error('Error during registration request:', registrationError);
-                            res.render('register', { error: 'An error occurred during registration', passwordStrength: 'Medium', passwordMatch: '', message: null });
+                            res.render('register', { error: 'An error occurred during registration', passwordStrength: 'Medium', passwordMatch: '', message: null, username: null });
                         }
                     });
             });
     } else {
-        return res.render('register', {error:"Please provide a valid email address.", passwordStrength: 'Medium', passwordMatch: '', message: null});         
+        return res.render('register', {error:"Please provide a valid email address.", passwordStrength: 'Medium', passwordMatch: '', message: null, username: null});         
     }
 };
 
@@ -122,47 +123,51 @@ exports.postLoginRoute = (req, res) => {
                 axios.post(userApiUrl)
                     .then(response => {
                         const userData = response.data;
+                        const username = req.session.email;
                         const user_id = userData.result[0].user_id;
                         req.session.user_id = user_id; // Set user_id in session
                         console.log(req.session);
-                        res.render('view', { error: null, message: null });
+                        res.render('view', { error: null, message: null, username });
                     })
                     .catch(userError => {
                         console.error('Error fetching user_id:', userError);
-                        res.render('login', { error: 'An error occurred while fetching user_id', message: null });
+                        res.render('login', { error: 'An error occurred while fetching user_id', message: null, username: null });
                     });
             } else if (responseData.message === 'User not found') {
-                res.render('login', { error: "User not found", message: null });
+                res.render('login', { error: "User not found", message: null, username: null });
             } else {
-                res.render('login', { error: "Incorrect Password", message: null });
+                res.render('login', { error: "Incorrect Password", message: null, username: null });
             }
         })
         .catch(error =>{
             if (error.response.status === 401) {
-                res.render('login', { error: 'Incorrect email or password', message: null });
+                res.render('login', { error: 'Incorrect email or password', message: null, username: null });
             } else if (error.response && error.response.status === 404) {
+                res.render('login', { error: 'Incorrect email or password', message: null, username: null });
                 console.log('User not found. Please check your credentials.');
             } else {
                 console.error('Error during login request:', error);
-                res.render('login', { error: 'An error occurred during login', message: null });
+                res.render('login', { error: 'An error occurred during login', message: null, username: null });
             }
         });
 }
 
 exports.getDefaultRoute = (req, res) =>{
-    res.render('login', {error:null, message: null});
+    res.render('login', {error:null, message: null, username: null});
 };
 
 exports.getViewRoute = [isAuthenticated, (req, res) => {
-    res.render('view', {error:null, message: null});
+    username = req.session.email;
+    res.render('view', {error:null, message: null, username});
 }]
 
 exports.getLogEmotionRoute = [isAuthenticated, (req, res) => {
     const user_id = req.session.user_id; // Retrieve user_id from session
     if (!user_id) {
-        return res.render('login', { error: 'User not logged in', message: null });
+        return res.render('login', { error: 'User not logged in', message: null, username: null });
     }else{
-        res.render('logEmotion',  { user_id, error: null, message: null });
+        username = req.session.email;
+        res.render('logEmotion',  { user_id, error: null, message: null, username });
     }
 }];
 
@@ -170,18 +175,21 @@ exports.postEmotionRoute = [isAuthenticated, (req, res) => {
     const apiUrl = `http://localhost:3002/emotion/add/emotion`;
     const { enjoyment, sadness, anger, contempt, disgust, fear, surprise, triggers} = req.body;
     const user_id = req.session.user_id;
+    username = req.session.email;
     axios.post(apiUrl, {user_id, enjoyment, sadness, anger, contempt, disgust, fear, surprise, triggers})
         .then(response => {
-            res.render('view', { error: null, message: null})
+            
+            res.render('view', { error: null, message: null, username})
         })
         .catch(error => {
             console.error('Error during request', error);
-            res.render('view', {error: 'An error occured', message: null});
+            res.render('view', {error: 'An error occured', message: null, username});
         })
 }];
 
 exports.getEmotionForUser = [isAuthenticated, (req, res) => {
     const user_id = req.session.user_id;
+    const username = req.session.email;
     const apiUrl = `http://localhost:3002/emotion/user/${user_id}`;
     axios.get(apiUrl)
         .then(response => {
@@ -191,16 +199,17 @@ exports.getEmotionForUser = [isAuthenticated, (req, res) => {
                 return emotion;
             });
             
-            res.render('emotionLog', { emotions, error: null, message: null });
+            res.render('emotionLog', { emotions, error: null, message: null, username });
         })
         .catch(error => {
             console.error('Error during request', error);
-            res.render('view', {error: 'An error occurred', message: null});
+            res.render('view', {error: 'An error occurred', message: null, username});
         });
 }];
 
 exports.putTriggers = [isAuthenticated, (req, res) => {
     const { emotion_id, triggers } = req.body;
+    const username = req.session.email;
     const apiUrl = `http://localhost:3002/emotion/updatetrigger`;
     console.log(emotion_id);
     console.log(triggers);
@@ -209,47 +218,63 @@ exports.putTriggers = [isAuthenticated, (req, res) => {
         .then(response => {
             // Check the response status or data to ensure the update was successful
             // res.status(200).json({ message: 'Triggers updated successfully' });
-            res.render('view');
+            res.render('view', {error: null, message: null, username});
         })
         .catch(error => {
             console.error('Error making edit', error);
-            res.status(500).json({ error: 'An error occurred while updating triggers', message: null });
+            res.status(500).json({ error: 'An error occurred while updating triggers', message: null, username });
         });
 }];
 
 
 exports.getEdit = [isAuthenticated, (req, res) => {
     const emotion_id = req.params.emotion_id;
-    // const { triggers } = req.body;
-    
-    res.render('editEmotion', {emotion_id, error: null, message: null})
+    const username = req.session.email;
+    const apiUrl = `http://localhost:3002/emotion/${emotion_id}`;
+
+    axios.get(apiUrl)
+        .then(response => {
+            const emotion = response.data.result;
+            // Format the timestamp of the emotion to a human-readable format
+            emotion.timestamp = dayjs(emotion.timestamp).format("YYYY-MM-DD HH:mm:ss");
+            const triggers = emotion.triggers;
+            console.log(triggers);
+            res.render('editEmotion', { emotion, emotion_id, triggers, error: null, message: null, username });
+        })
+        .catch(error => {
+            console.error('Error rendering page', error);
+            res.status(500).json({ error: 'An error occurred while loading the specified emotion log', message: null, username });
+        });
 }];
+
 
 exports.getDelete = [isAuthenticated, (req, res) => {
     const emotion_id = req.params.emotion_id;
+    const username = req.session.email;
     // const { triggers } = req.body;
     
-    res.render('deleteEmotion', {emotion_id, error: null, message: null})
+    res.render('deleteEmotion', {emotion_id, error: null, message: null, username})
 }];
 
 exports.getAccountRoute = [isAuthenticated, (req, res) => {
-    
+    const usernmame = req.session.email;
     // const { triggers } = req.body;
     
-    res.render('account', {error: null, message: null})
+    res.render('account', {error: null, message: null, username})
 }];
 
 exports.deleteDelete = [isAuthenticated, (req, res) => {
     const { emotion_id }  = req.body;
+    const username = req.session.email;
     const apiUrl = `http://localhost:3002/emotion/delete/${emotion_id}`;
     console.log('Emotion to be deleted' + emotion_id);
     axios.delete(apiUrl)
         .then(() => {
-            res.render('view', {error: null, message: null});
+            res.render('view', {error: null, message: null, username});
         })
         .catch(error => {
             console.error('Error deleting Log', error);
-            res.status(500).json({ error: 'An error occured deleting the log'});
+            res.status(500).json({ error: 'An error occured deleting the log', message: null, username});
         });
 }];
 
@@ -271,7 +296,7 @@ exports.getEmotionChart = [isAuthenticated, async (req, res) => {
         const apiUrl = `http://localhost:3002/emotion/user/${user_id}`;
         const response = await axios.get(apiUrl);
         const emotions = response.data.result;
-        
+        const username = req.session.email;
         // Render the emotionChart.ejs file and pass the fetched data to it
         
         console.log(emotions);
@@ -306,20 +331,23 @@ exports.getEmotionChart = [isAuthenticated, async (req, res) => {
             surpriseArray: surpriseArray,
             xlabels: xlabels,
             error: null,
-            message: null
+            message: null,
+            username
         });
         // console.log(enjoymentArray);
     
         // Iterate over the array of emotion objects
         
     } catch (error) {
+        const username = req.session.email;
         console.error('Error fetching emotion data:', error);
-        res.render('view', { error: 'An error occurred while fetching emotion data', message: null });
+        res.render('view', { error: 'An error occurred while fetching emotion data', message: null, username });
     }
 }];
 
 exports.emotionForUserbyDate = [isAuthenticated, (req, res) => {
     const user_id = req.session.user_id;
+    const username = req.session.email;
     const startDate = req.body.startDate;
     const endDate = req.body.endDate;
 
@@ -338,10 +366,10 @@ exports.emotionForUserbyDate = [isAuthenticated, (req, res) => {
                 return emotion;
             });
             
-            res.render('emotionLog', { emotions, error: null, message: null });
+            res.render('emotionLog', { emotions, error: null, message: null, username });
         })
         .catch(error => {
             console.error('Error during request', error);
-            res.render('view', { error: 'No logs for selected dates', message: null });
+            res.render('view', { error: 'No logs for selected dates', message: null, username });
         });
 }];
