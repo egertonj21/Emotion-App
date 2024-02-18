@@ -275,10 +275,17 @@ exports.getDelete = [isAuthenticated, (req, res) => {
 // }];
 
 exports.getAccountRoute = [isAuthenticated, (req, res) => {
-    const usernmame = req.session.email;
+    const username = req.session.email;
     // const { triggers } = req.body;
     
     res.render('account', {error: null, message: null, username})
+}];
+
+exports.getPasswordChangeRoute = [isAuthenticated, (req, res) => {
+    const username = req.session.email;
+    // const { triggers } = req.body;
+    
+    res.render('passwordChange', { error: '', passwordStrength: 'Medium', passwordMatch: '', message: null, username: null })
 }];
 
 exports.deleteDelete = [isAuthenticated, (req, res) => {
@@ -391,3 +398,36 @@ exports.emotionForUserbyDate = [isAuthenticated, (req, res) => {
             res.render('view', { error: 'No logs for selected dates', message: null, username });
         });
 }];
+
+exports.putPasswordChange = async (req, res) => {
+    const { newPassword, passwordCheck } = req.body;
+    const email = req.session.email;
+    const username = req.session.username;
+
+    if (!newPassword || !passwordCheck || newPassword !== passwordCheck) {
+        return res.status(400).json({
+            error: "New passwords do not match."
+        });
+    }
+
+    try {
+        // Make a request to your API to change the password
+        const response = await axios.put(`http://localhost:3002/emotion/updatePassword`, {
+            email: email,
+            newPassword: newPassword
+        });
+
+        if (response.data && response.data.message === 'Password updated successfully') {
+            // Password updated successfully
+            return res.render('account', { error: null, message: "Password updated successfully.", username });
+        } else {
+            // Handle other response cases if necessary
+            console.error('Error changing password. Response:', response.data);
+            return res.status(500).json({ error: 'An error occurred while changing password.' });
+        }
+    } catch (error) {
+        console.error('Error changing password:', error);
+        return res.status(500).json({ error: 'An error occurred while changing password.' });
+    }
+};
+
