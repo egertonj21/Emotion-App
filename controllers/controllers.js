@@ -119,12 +119,13 @@ exports.postLoginRoute = (req, res) => {
 
                 // Fetch user_id based on the email
                 const userApiUrl = `http://localhost:3002/emotion/email/${email}`;
-                axios.post(userApiUrl)
+                axios.get(userApiUrl)
                     .then(response => {
                         const userData = response.data;
                         const username = req.session.email;
-                        const user_id = userData.result[0].user_id;
-                        req.session.user_id = user_id; // Set user_id in session
+                        const user_id = userData.data;
+                        console.log(user_id);
+                        req.session.user_id = userData.data; // Set user_id in session
                         console.log(req.session);
                         res.render('view', { error: null, message: null, username });
                     })
@@ -194,7 +195,7 @@ exports.getEmotionForUser = [isAuthenticated, (req, res) => {
     axios.get(apiUrl)
         .then(response => {
             if (response.data.status === 'success') {
-                const emotions = response.data.result.map(emotion => {
+                const emotions = response.data.data.map(emotion => {
                     // Format the timestamp of each emotion to a human-readable format
                     emotion.timestamp = dayjs(emotion.timestamp).format("YYYY-MM-DD HH:mm:ss");
                     return emotion;
@@ -337,7 +338,7 @@ exports.getEmotionChart = [isAuthenticated, async (req, res) => {
         const user_id = req.session.user_id;
         const apiUrl = `http://localhost:3002/emotion/user/${user_id}`;
         const response = await axios.get(apiUrl);
-        const emotions = response.data.result;
+        const emotions = response.data.data;
         const username = req.session.email;
 
         const enjoymentArray = [];
