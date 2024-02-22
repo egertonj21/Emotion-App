@@ -69,11 +69,10 @@ exports.postRegisterRoute = async (req, res) => {
                         req.session.email = email; // Set email in session
 
                         // Fetch user_id based on the email
-                        axios.post(userApiUrl)
+                        axios.get(userApiUrl)
                             .then(response => {
                                 const userData = response.data;
-                                // Check if the result array is not empty before accessing user_id
-                                const user_id = userData.result.length > 0 ? userData.result[0].user_id : null;
+                                const user_id = responseData.data.insertId;
                                 req.session.user_id = user_id; // Set user_id in session
                                 username = req.session.email;
                                 console.log(req.session);
@@ -251,7 +250,7 @@ exports.getEdit = [isAuthenticated, (req, res) => {
 
     axios.get(apiUrl)
         .then(response => {
-            const emotion = response.data.result;
+            const emotion = response.data.data;
             // Format the timestamp of the emotion to a human-readable format
             emotion.timestamp = dayjs(emotion.timestamp).format("YYYY-MM-DD HH:mm:ss");
             const triggers = emotion.triggers;
@@ -271,7 +270,7 @@ exports.getDelete = [isAuthenticated, (req, res) => {
 
     axios.get(apiUrl)
         .then(response => {
-            const emotion = response.data.result;
+            const emotion = response.data.data;
             // Format the timestamp of the emotion to a human-readable format
             emotion.timestamp = dayjs(emotion.timestamp).format("YYYY-MM-DD HH:mm:ss");
             const triggers = emotion.triggers;
@@ -407,6 +406,7 @@ exports.emotionForUserbyDate = [isAuthenticated, (req, res) => {
     const username = req.session.email;
     const startDate = req.body.startDate;
     const endDate = req.body.endDate;
+    let emotions =[];
 
     // Format the dates to UK date format (DD/MM/YYYY)
     const formattedStartDate = dayjs(startDate).format('YYYY-MM-DD');
@@ -417,7 +417,7 @@ exports.emotionForUserbyDate = [isAuthenticated, (req, res) => {
     const apiUrl = `http://localhost:3002/emotion/userByDate/${user_id}`;
     axios.get(apiUrl, { params: { startDate: formattedStartDate, endDate: formattedEndDate } })
         .then(response => {
-            const emotions = response.data.result.map(emotion => {
+            const emotions = response.data.data.map(emotion => {
                 // Format the timestamp of each emotion to a human-readable format
                 emotion.timestamp = dayjs(emotion.timestamp).format("YYYY-MM-DD HH:mm:ss");
                 return emotion;
@@ -488,7 +488,7 @@ exports.getDeleteEmotionsRoute = [isAuthenticated, (req, res) => {
     axios.get(apiUrl)
         .then(response => {
             if (response.data.status === 'success') {
-                const emotions = response.data.result.map(emotion => {
+                const emotions = response.data.data.map(emotion => {
                     // Format the timestamp of each emotion to a human-readable format
                     emotion.timestamp = dayjs(emotion.timestamp).format("YYYY-MM-DD HH:mm:ss");
                     return emotion;
