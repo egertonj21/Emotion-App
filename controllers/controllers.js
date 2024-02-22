@@ -282,25 +282,18 @@ exports.getDelete = [isAuthenticated, (req, res) => {
             res.status(500).json({ error: 'An error occurred while loading the specified emotion log', message: null, username });
         });
 }];
-// exports.getDelete = [isAuthenticated, (req, res) => {
-//     const emotion_id = req.params.emotion_id;
-//     const username = req.session.email;
-//     // const { triggers } = req.body;
-    
-//     res.render('deleteEmotion', {emotion_id, error: null, message: null, username})
-// }];
 
 exports.getAccountRoute = [isAuthenticated, (req, res) => {
     const username = req.session.email;
     const user_id = req.session.user_id;
-    // const { triggers } = req.body;
+    
     
     res.render('account', {error: null, message: null, username, user_id})
 }];
 
 exports.getPasswordChangeRoute = [isAuthenticated, (req, res) => {
     const username = req.session.email;
-    // const { triggers } = req.body;
+    
     
     res.render('passwordChange', { error: '', passwordStrength: 'Medium', passwordMatch: '', message: null, username: null })
 }];
@@ -408,7 +401,7 @@ exports.emotionForUserbyDate = [isAuthenticated, (req, res) => {
     const endDate = req.body.endDate;
     let emotions =[];
 
-    // Format the dates to UK date format (DD/MM/YYYY)
+    
     const formattedStartDate = dayjs(startDate).format('YYYY-MM-DD');
     const formattedEndDate = dayjs(endDate).format('YYYY-MM-DD');
 
