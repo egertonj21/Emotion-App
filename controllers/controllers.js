@@ -534,3 +534,10 @@ exports.deleteAll = async (req, res) => {
         res.render('account', { error: 'Could not delete account', message: null, username, user_id });
     }
 }
+exports.catchAllRoute = (req, res) => {
+    if (req.session.isLoggedIn && req.session.user_id) {
+        res.status(404).render('view', { error: 'Page not found', message: null, username: req.session.email });
+    } else {
+        res.status(404).render('login', { error: 'Page not found', message: null, username: null });
+    }
+};
