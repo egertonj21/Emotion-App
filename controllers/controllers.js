@@ -69,11 +69,10 @@ exports.postRegisterRoute = async (req, res) => {
                         req.session.email = email; // Set email in session
 
                         // Fetch user_id based on the email
-                        axios.post(userApiUrl)
+                        axios.get(userApiUrl)
                             .then(response => {
                                 const userData = response.data;
-                                // Check if the result array is not empty before accessing user_id
-                                const user_id = userData.result.length > 0 ? userData.result[0].user_id : null;
+                                const user_id = responseData.data.insertId;
                                 req.session.user_id = user_id; // Set user_id in session
                                 username = req.session.email;
                                 console.log(req.session);
@@ -119,12 +118,13 @@ exports.postLoginRoute = (req, res) => {
 
                 // Fetch user_id based on the email
                 const userApiUrl = `http://localhost:3002/emotion/email/${email}`;
-                axios.post(userApiUrl)
+                axios.get(userApiUrl)
                     .then(response => {
                         const userData = response.data;
                         const username = req.session.email;
-                        const user_id = userData.result[0].user_id;
-                        req.session.user_id = user_id; // Set user_id in session
+                        const user_id = userData.data;
+                        console.log(user_id);
+                        req.session.user_id = userData.data; // Set user_id in session
                         console.log(req.session);
                         res.render('view', { error: null, message: null, username });
                     })
@@ -194,7 +194,7 @@ exports.getEmotionForUser = [isAuthenticated, (req, res) => {
     axios.get(apiUrl)
         .then(response => {
             if (response.data.status === 'success') {
-                const emotions = response.data.result.map(emotion => {
+                const emotions = response.data.data.map(emotion => {
                     // Format the timestamp of each emotion to a human-readable format
                     emotion.timestamp = dayjs(emotion.timestamp).format("YYYY-MM-DD HH:mm:ss");
                     return emotion;
@@ -250,7 +250,7 @@ exports.getEdit = [isAuthenticated, (req, res) => {
 
     axios.get(apiUrl)
         .then(response => {
-            const emotion = response.data.result;
+            const emotion = response.data.data;
             // Format the timestamp of the emotion to a human-readable format
             emotion.timestamp = dayjs(emotion.timestamp).format("YYYY-MM-DD HH:mm:ss");
             const triggers = emotion.triggers;
@@ -270,7 +270,7 @@ exports.getDelete = [isAuthenticated, (req, res) => {
 
     axios.get(apiUrl)
         .then(response => {
-            const emotion = response.data.result;
+            const emotion = response.data.data;
             // Format the timestamp of the emotion to a human-readable format
             emotion.timestamp = dayjs(emotion.timestamp).format("YYYY-MM-DD HH:mm:ss");
             const triggers = emotion.triggers;
@@ -282,25 +282,18 @@ exports.getDelete = [isAuthenticated, (req, res) => {
             res.status(500).json({ error: 'An error occurred while loading the specified emotion log', message: null, username });
         });
 }];
-// exports.getDelete = [isAuthenticated, (req, res) => {
-//     const emotion_id = req.params.emotion_id;
-//     const username = req.session.email;
-//     // const { triggers } = req.body;
-    
-//     res.render('deleteEmotion', {emotion_id, error: null, message: null, username})
-// }];
 
 exports.getAccountRoute = [isAuthenticated, (req, res) => {
     const username = req.session.email;
     const user_id = req.session.user_id;
-    // const { triggers } = req.body;
+    
     
     res.render('account', {error: null, message: null, username, user_id})
 }];
 
 exports.getPasswordChangeRoute = [isAuthenticated, (req, res) => {
     const username = req.session.email;
-    // const { triggers } = req.body;
+    
     
     res.render('passwordChange', { error: '', passwordStrength: 'Medium', passwordMatch: '', message: null, username: null })
 }];
@@ -337,7 +330,7 @@ exports.getEmotionChart = [isAuthenticated, async (req, res) => {
         const user_id = req.session.user_id;
         const apiUrl = `http://localhost:3002/emotion/user/${user_id}`;
         const response = await axios.get(apiUrl);
-        const emotions = response.data.result;
+        const emotions = response.data.data;
         const username = req.session.email;
 
         const enjoymentArray = [];
@@ -406,8 +399,9 @@ exports.emotionForUserbyDate = [isAuthenticated, (req, res) => {
     const username = req.session.email;
     const startDate = req.body.startDate;
     const endDate = req.body.endDate;
+    let emotions =[];
 
-    // Format the dates to UK date format (DD/MM/YYYY)
+    
     const formattedStartDate = dayjs(startDate).format('YYYY-MM-DD');
     const formattedEndDate = dayjs(endDate).format('YYYY-MM-DD');
 
@@ -416,7 +410,7 @@ exports.emotionForUserbyDate = [isAuthenticated, (req, res) => {
     const apiUrl = `http://localhost:3002/emotion/userByDate/${user_id}`;
     axios.get(apiUrl, { params: { startDate: formattedStartDate, endDate: formattedEndDate } })
         .then(response => {
-            const emotions = response.data.result.map(emotion => {
+            const emotions = response.data.data.map(emotion => {
                 // Format the timestamp of each emotion to a human-readable format
                 emotion.timestamp = dayjs(emotion.timestamp).format("YYYY-MM-DD HH:mm:ss");
                 return emotion;
@@ -430,6 +424,83 @@ exports.emotionForUserbyDate = [isAuthenticated, (req, res) => {
             res.render('emotionLog', { emotions, error: 'No logs for selected dates', message: null, username });
         });
 }];
+
+exports.emotionForUserbyDateChart = [isAuthenticated, (req, res) => {
+    const user_id = req.session.user_id;
+    const username = req.session.email;
+    const startDate = req.body.startDate;
+    const endDate = req.body.endDate;
+
+    const formattedStartDate = dayjs(startDate).format('YYYY-MM-DD');
+    const formattedEndDate = dayjs(endDate).format('YYYY-MM-DD');
+
+    console.log(formattedStartDate, formattedEndDate);
+
+    const apiUrl = `http://localhost:3002/emotion/userByDate/${user_id}`;
+    axios.get(apiUrl, { params: { startDate: formattedStartDate, endDate: formattedEndDate } })
+        .then(response => {
+            const emotions = response.data.data.map(emotion => {
+                // Format the timestamp of each emotion to a human-readable format
+                emotion.timestamp = dayjs(emotion.timestamp).format("YYYY-MM-DD HH:mm:ss");
+                return emotion;
+            });
+
+            const enjoymentArray = [];
+            const sadnessArray = [];
+            const angerArray = [];
+            const contemptArray = [];
+            const disgustArray = [];
+            const fearArray = [];
+            const surpriseArray = [];
+            const xlabels = [];
+
+            for (let i = 0; i < emotions.length; i++) {
+                const emotion = emotions[i];
+                enjoymentArray.push(emotion.enjoyment);
+                sadnessArray.push(emotion.sadness);
+                angerArray.push(emotion.anger);
+                contemptArray.push(emotion.contempt);
+                disgustArray.push(emotion.disgust);
+                fearArray.push(emotion.fear);
+                surpriseArray.push(emotion.surprise);
+                const formattedTimestamp = dayjs(emotion.timestamp).format('YYYY-MM-DD HH:mm:ss');
+                xlabels.push(formattedTimestamp);
+            }
+
+            res.render('emotionChart', {
+                emotions: emotions,
+                enjoymentArray: enjoymentArray,
+                sadnessArray: sadnessArray,
+                angerArray: angerArray,
+                contemptArray: contemptArray,
+                disgustArray: disgustArray,
+                fearArray: fearArray,
+                surpriseArray: surpriseArray,
+                xlabels: xlabels,
+                error: null,
+                message: null,
+                username
+            });
+        })
+        .catch(error => {
+            console.error('Error during request', error);
+            res.render('emotionChart', {
+                emotions: [],
+                enjoymentArray: [],
+                sadnessArray: [],
+                angerArray: [],
+                contemptArray: [],
+                disgustArray: [],
+                fearArray: [],
+                surpriseArray: [],
+                xlabels: [],
+                error: 'No logs for selected dates',
+                message: null,
+                username
+            });
+        });
+}];
+
 
 exports.putPasswordChange = async (req, res) => {
     const { newPassword, passwordCheck } = req.body;
@@ -487,7 +558,7 @@ exports.getDeleteEmotionsRoute = [isAuthenticated, (req, res) => {
     axios.get(apiUrl)
         .then(response => {
             if (response.data.status === 'success') {
-                const emotions = response.data.result.map(emotion => {
+                const emotions = response.data.data.map(emotion => {
                     // Format the timestamp of each emotion to a human-readable format
                     emotion.timestamp = dayjs(emotion.timestamp).format("YYYY-MM-DD HH:mm:ss");
                     return emotion;
@@ -540,3 +611,10 @@ exports.deleteAll = async (req, res) => {
         res.render('account', { error: 'Could not delete account', message: null, username, user_id });
     }
 }
+exports.catchAllRoute = (req, res) => {
+    if (req.session.isLoggedIn && req.session.user_id) {
+        res.status(404).render('view', { error: 'Page not found', message: null, username: req.session.email });
+    } else {
+        res.status(404).render('login', { error: 'Page not found', message: null, username: null });
+    }
+};

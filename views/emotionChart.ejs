@@ -31,7 +31,24 @@
         <canvas id="myCanvas"></canvas>
         
     </div>
-    <div class = "container-fluid">
+    
+
+    <form action="filterByDateChart" method="POST" class="mt-4 mx-auto" style="width: 98%;">
+        <div class="row g-3">
+            <div class="col-auto">
+                <label for="startDate" class="form-label">Start Date</label>
+                <input type="date" class="form-control" id="startDate" name="startDate">
+            </div>
+            <div class="col-auto">
+                <label for="endDate" class="form-label">End Date</label>
+                <input type="date" class="form-control" id="endDate" name="endDate">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary btn-submit">Submit</button>
+            </div>
+        </div>
+    </form>
+    <div class="container-fluid mt-4">
         <div class="col">
             <form method="GET" action="/view">
                 <button type="submit" class="btn btn-secondary btn-back">Back to Menu</button>
