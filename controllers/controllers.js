@@ -425,6 +425,83 @@ exports.emotionForUserbyDate = [isAuthenticated, (req, res) => {
         });
 }];
 
+exports.emotionForUserbyDateChart = [isAuthenticated, (req, res) => {
+    const user_id = req.session.user_id;
+    const username = req.session.email;
+    const startDate = req.body.startDate;
+    const endDate = req.body.endDate;
+
+    const formattedStartDate = dayjs(startDate).format('YYYY-MM-DD');
+    const formattedEndDate = dayjs(endDate).format('YYYY-MM-DD');
+
+    console.log(formattedStartDate, formattedEndDate);
+
+    const apiUrl = `http://localhost:3002/emotion/userByDate/${user_id}`;
+    axios.get(apiUrl, { params: { startDate: formattedStartDate, endDate: formattedEndDate } })
+        .then(response => {
+            const emotions = response.data.data.map(emotion => {
+                // Format the timestamp of each emotion to a human-readable format
+                emotion.timestamp = dayjs(emotion.timestamp).format("YYYY-MM-DD HH:mm:ss");
+                return emotion;
+            });
+
+            const enjoymentArray = [];
+            const sadnessArray = [];
+            const angerArray = [];
+            const contemptArray = [];
+            const disgustArray = [];
+            const fearArray = [];
+            const surpriseArray = [];
+            const xlabels = [];
+
+            for (let i = 0; i < emotions.length; i++) {
+                const emotion = emotions[i];
+                enjoymentArray.push(emotion.enjoyment);
+                sadnessArray.push(emotion.sadness);
+                angerArray.push(emotion.anger);
+                contemptArray.push(emotion.contempt);
+                disgustArray.push(emotion.disgust);
+                fearArray.push(emotion.fear);
+                surpriseArray.push(emotion.surprise);
+                const formattedTimestamp = dayjs(emotion.timestamp).format('YYYY-MM-DD HH:mm:ss');
+                xlabels.push(formattedTimestamp);
+            }
+
+            res.render('emotionChart', {
+                emotions: emotions,
+                enjoymentArray: enjoymentArray,
+                sadnessArray: sadnessArray,
+                angerArray: angerArray,
+                contemptArray: contemptArray,
+                disgustArray: disgustArray,
+                fearArray: fearArray,
+                surpriseArray: surpriseArray,
+                xlabels: xlabels,
+                error: null,
+                message: null,
+                username
+            });
+        })
+        .catch(error => {
+            console.error('Error during request', error);
+            res.render('emotionChart', {
+                emotions: [],
+                enjoymentArray: [],
+                sadnessArray: [],
+                angerArray: [],
+                contemptArray: [],
+                disgustArray: [],
+                fearArray: [],
+                surpriseArray: [],
+                xlabels: [],
+                error: 'No logs for selected dates',
+                message: null,
+                username
+            });
+        });
+}];
+
+
 exports.putPasswordChange = async (req, res) => {
     const { newPassword, passwordCheck } = req.body;
     const email = req.session.email;
