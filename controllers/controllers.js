@@ -34,72 +34,63 @@ exports.getRegisterRoute = (req, res) => {
 
 exports.postRegisterRoute = async (req, res) => {
     const { email, password } = req.body;
-    
     if (!email || !password) {
-        return res.status(400).send({
-            message: "Email or password missing."
-        });
+    return res.status(400).send({
+        message: "Email or password missing."
+    });
     }
-
     // Validate the email using the email-validator middleware
     if (!validator.validate(email)) {
-        return res.render('register', {error:"Please provide a valid email address.", passwordStrength: 'Medium', passwordMatch: '', message: null, username: null});         
+    return res.render('register', {error:"Please provide a valid email address.", passwordStrength: 'Medium', passwordMatch: '', message: null, username: null});         
     }
-
     // Check if the passwords match
     if (password !== req.body.passwordCheck) {
-        return res.render('register', { error: 'Passwords do not match', passwordStrength: 'Medium', passwordMatch: '', message: null, username: null});
+    return res.render('register', { error: 'Passwords do not match', passwordStrength: 'Medium', passwordMatch: '', message: null, username: null});
     }
 
-    // Check if the email is already taken
-    const userApiUrl = `http://localhost:3002/emotion/email/${email}`;
-    axios.post(userApiUrl)
+    const apiUrl = `http://localhost:3002/emotion/add/user`;
+    axios.post(apiUrl, { email, password })
+    .then(response => {
+    const responseData = response.data;
+    console.log(responseData);
+    if (responseData.status === 'success') {
+        req.session.isLoggedIn = true;
+        req.session.email = email; // Set email in session
+        // Fetch user_id based on the email
+        const userApiUrl = `http://localhost:3002/emotion/email/${email}`;
+        axios.get(userApiUrl)
         .then(response => {
-            const userData = response.data;
-            return res.render('register', { error: 'Email already taken', passwordStrength: 'Medium', passwordMatch: '', message: null, username: null });
+        const userData = response.data;
+        const user_id = responseData.data.insertId;
+        req.session.user_id = user_id; // Set user_id in session
+        username = req.session.email;
+        console.log(req.session);
+        res.render('view', { error: null, message: null, username });
         })
-        .catch(error => {
-            const apiUrl = `http://localhost:3002/emotion/add/user`;
-            axios.post(apiUrl, { email, password })
-                .then(response => {
-                    const responseData = response.data;
-                    console.log(responseData);
-                    if (responseData.status === 'success') {
-                        req.session.isLoggedIn = true;
-                        req.session.email = email; // Set email in session
-
-                        // Fetch user_id based on the email
-                        axios.get(userApiUrl)
-                            .then(response => {
-                                const userData = response.data;
-                                const user_id = responseData.data.insertId;
-                                req.session.user_id = user_id; // Set user_id in session
-                                username = req.session.email;
-                                console.log(req.session);
-                                res.render('view', { error: null, message: null, username });
-                            })
-                            .catch(userError => {
-                                console.error('Error fetching user_id:', userError);
-                                res.render('login', { error: 'An error occurred while fetching user_id', message: null, username: null });
-                            });
-                    } else if (responseData.message === 'User not found') {
-                        res.render('login', { error: "User not found", message: null, username: null });
-                    } else {
-                        res.render('login', { error: "Incorrect Password", message: null, username: null });
-                    }
-                })
-                .catch(registrationError => {
-                    if (registrationError.response && registrationError.response.status === 401) {
-                        res.render('login', { error: 'Incorrect email or password', message: null, username: null });
-                    } else if (registrationError.response && registrationError.response.status === 404) {
-                        console.log('User not found. Please check your credentials.');
-                    } else {
-                        console.error('Error during registration request:', registrationError);
-                        res.render('register', { error: 'An error occurred during registration', passwordStrength: 'Medium', passwordMatch: '', message: null, username: null });
-                    }
-                });
+        .catch(userError => {
+        console.error('Error fetching user_id:', userError);
+        res.render('login', { error: 'An error occurred while fetching user_id', message: null, username: null });
         });
+    } else if (responseData.message === 'User not found') {
+        res.render('login', { error: "User not found", message: null, username: null });
+    } else {
+        res.render('login', { error: "Incorrect Password", message: null, username: null });
+    }
+    })
+    .catch(registrationError => {
+    if (registrationError.response && registrationError.response.status === 400) {
+        return res.render('register', { error: 'Email already taken', passwordStrength: 'Medium', passwordMatch: '', message: null, username: null });
+    } else if (registrationError.response && registrationError.response.status === 401) {
+        res.render('login', { error: 'Incorrect email or password', message: null, username: null });
+    } else if (registrationError.response && registrationError.response.status === 404) {
+        console.log('User not found. Please check your credentials.');
+    } else {
+        console.error('Error during registration request:', registrationError);
+        res.render('register', { error: 'An error occurred during registration', passwordStrength: 'Medium', passwordMatch: '', message: null, username: null });
+    }
+    });
 };
+
 
 
 exports.postLoginRoute = (req, res) => {
